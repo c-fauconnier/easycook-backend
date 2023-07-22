@@ -116,7 +116,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                         await this.ingredientsRepo.save(foundIngredient);
                         newIngredients.push(riEntity);
                     } else {
-                        const error = new ErrorResponse(`L'ingrédient ${ingredient} n'existe pas`, 'ingredients');
+                        const error = new ErrorResponse(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
                         this.errors.push(error);
                         return this.errors;
                     }

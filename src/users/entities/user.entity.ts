@@ -5,6 +5,7 @@ import { Role } from '../../shared/enums/role.enum';
 import { Recipe } from '../../recipes/entities/recipe.entity';
 import { Comment } from '../../recipes/entities/comment.entity';
 import { Restriction } from './restriction.entity';
+import { Lecture } from '../../lecture/entities/lecture.entity';
 
 @Entity()
 export class User extends EasyCookBaseEntity {
@@ -24,6 +25,8 @@ export class User extends EasyCookBaseEntity {
     recipes: Recipe[];
     @OneToMany(() => Comment, (comment) => comment.author, { eager: true })
     comments: Comment[];
+    @OneToMany(() => Lecture, (lecture) => lecture.author)
+    lectures: Lecture[];
     @OneToMany(() => Restriction, (restriction) => restriction.user)
     restrictions: Restriction[];
 }

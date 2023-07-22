@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UsersModule } from './users/users.module';
 import { RecipesModule } from './recipes/recipes.module';
+import { LectureModule } from './lecture/lecture.module';
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import { RecipesModule } from './recipes/recipes.module';
             host: 'localhost',
             port: 5432,
             username: 'easycook',
-            password: process.env.DB_PASSWORD,
+            password: 'jS1AUG2PPvFt2L',
             //A définir
             database: 'easycook',
             //Ne peut être activé pour la production.
@@ -26,6 +27,7 @@ import { RecipesModule } from './recipes/recipes.module';
         }),
         UsersModule,
         RecipesModule,
+        LectureModule,
     ],
     controllers: [AppController],
     providers: [AppService],
