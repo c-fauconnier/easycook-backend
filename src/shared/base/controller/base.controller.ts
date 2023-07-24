@@ -5,7 +5,7 @@ import { EasyCookBaseService } from '../provider/base.service';
 import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
 
 export class EasyCookBaseController<T extends EasyCookBaseEntity> {
-    constructor(private readonly service: EasyCookBaseService<T>) {}
+    constructor(public service: EasyCookBaseService<T>) {}
 
     @Post()
     create(@Body() dto: any): Promise<T | ErrorResponse[]> {

@@ -13,7 +13,7 @@ export class Lecture extends EasyCookBaseEntity {
     difficulty: number;
     @Column({ default: false })
     isCompleted: boolean;
-    @Column()
+    @Column({ default: 0 })
     rating: number;
 
     //Relationships

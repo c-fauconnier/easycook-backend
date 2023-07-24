@@ -138,4 +138,12 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
     canDelete(user?: Token): boolean {
         return true;
     }
+
+    async verifyTitle(title: string): Promise<boolean> {
+        try {
+            return !!(await this.repo.findOne({ where: { title: title } }));
+        } catch (err) {
+            throw err;
+        }
+    }
 }
