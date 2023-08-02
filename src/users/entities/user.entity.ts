@@ -27,6 +27,8 @@ export class User extends EasyCookBaseEntity {
     comments: Comment[];
     @OneToMany(() => Lecture, (lecture) => lecture.author)
     lectures: Lecture[];
+    @OneToMany(() => Lecture, (lecture) => lecture.rating)
+    lectureRate: Lecture[];
     @OneToMany(() => Restriction, (restriction) => restriction.user)
     restrictions: Restriction[];
 }

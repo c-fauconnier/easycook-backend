@@ -1,7 +1,8 @@
+import { AuthGuard } from '../../../auth/auth/auth.guard';
 import { Lecture } from '../../entities/lecture.entity';
 import { LecturesService } from '../../providers/lectures/lectures.service';
 import { EasyCookBaseController } from './../../../shared/base/controller/base.controller';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
 @Controller('lectures')
 export class LecturesController extends EasyCookBaseController<Lecture> {

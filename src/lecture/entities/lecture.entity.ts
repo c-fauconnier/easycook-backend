@@ -10,12 +10,13 @@ export class Lecture extends EasyCookBaseEntity {
     @Column()
     duration: number;
     @Column()
+    description: string;
+    @Column()
     difficulty: number;
     @Column({ default: false })
     isCompleted: boolean;
-    @Column({ default: 0 })
+    @ManyToOne(() => User, (user) => user.lectureRate, { eager: true })
     rating: number;
-
     //Relationships
     @OneToMany(() => Chapter, (chapter) => chapter.lecture, { eager: true, cascade: true })
     chapters: Chapter[];

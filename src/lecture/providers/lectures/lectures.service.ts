@@ -30,9 +30,7 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
         if (dto.difficulty < 0 || dto.difficulty > 5) {
             return this.generateNewError('La difficulté du cours doit être comprise entre 0 et 5', 'difficulty');
         }
-        if (dto.rating < 0 || dto.rating > 5) {
-            return this.generateNewError('Le rating du cours doit être comprise entre 0 et 5', 'rating');
-        }
+
         //Lorsque la connexion marche
         // if (!dto.authorID) {
         //     this.generateNewError(`L'auteur doit être défini`, 'authorID');
@@ -93,7 +91,6 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
                 lecture.duration = dto.duration;
                 lecture.difficulty = dto.difficulty;
                 lecture.chapters = [];
-                lecture.rating = dto.rating;
                 for (const chap of dto.chapters) {
                     let chapterEntity = new Chapter();
                     chapterEntity.title = chap.title;

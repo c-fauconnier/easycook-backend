@@ -10,5 +10,6 @@ import { Lecture } from '../lecture/entities/lecture.entity';
     imports: [TypeOrmModule.forFeature([User, Restriction, Lecture])],
     controllers: [UsersController],
     providers: [UsersService],
+    exports: [UsersService],
 })
 export class UsersModule {}

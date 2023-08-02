@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { UsersModule } from './users/users.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { LectureModule } from './lecture/lecture.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { LectureModule } from './lecture/lecture.module';
         UsersModule,
         RecipesModule,
         LectureModule,
+        AuthModule,
     ],
     controllers: [AppController],
     providers: [AppService],
