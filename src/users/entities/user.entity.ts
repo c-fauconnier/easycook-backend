@@ -13,7 +13,7 @@ export class User extends EasyCookBaseEntity {
     name: string;
     @Column({ length: 50 })
     surname: string;
-    @Column({ length: 50 })
+    @Column({ length: 50, unique: true })
     nickname: string;
     @Column({ unique: true })
     email: string;

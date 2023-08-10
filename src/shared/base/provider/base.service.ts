@@ -161,7 +161,7 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * Créer une nouvelle erreur dans le tableau des erreurs
      * @param message Le message de l'erreur
      * @param source La source de l'erreur
-     * @returns renvoie false et donc impossible d'éxuter les méthodes de businnes logic
+     * @returns renvoie false et donc impossible d'exécuter les méthodes de businness logic
      */
     generateNewError(message: string, source: string): boolean {
         if (!message || !source) return;

@@ -1,5 +1,5 @@
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { EasyCookBaseController } from 'src/shared/base/controller/base.controller';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../provider/users/users.service';
@@ -12,8 +12,8 @@ export class UsersController extends EasyCookBaseController<User> {
         super(service);
     }
 
+    // route to register a new user
     @Post()
-    @UseInterceptors(FileInterceptor('file'))
     create(@Body() dto: CreateUserDto): Promise<User | ErrorResponse[]> {
         return this.service.create(dto);
     }
