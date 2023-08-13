@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { LectureModule } from './lecture/lecture.module';
 import { AuthModule } from './auth/auth.module';
+import { ConfirmEmailModule } from './confirm-email/confirm-email.module';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
         RecipesModule,
         LectureModule,
         AuthModule,
+        ConfirmEmailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

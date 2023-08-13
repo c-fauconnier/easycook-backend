@@ -6,6 +6,8 @@ import { CreateUserDto } from 'src/users/interfaces/create-user.dto';
 import { ErrorResponse } from 'src/shared/models/error-response';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
+
 const argon2 = require('argon2');
 
 @Injectable()
@@ -82,5 +84,10 @@ export class UsersService extends EasyCookBaseService<User> {
         const accountWithNickname = await this.repo.findOne({ where: { nickname: nickname } });
 
         return !accountWithNickname ? true : false;
+    }
+
+    async findByEmail(email: string): Promise<User> {
+        const user = await this.repo.findOne({ where: { email: email } });
+        return user;
     }
 }

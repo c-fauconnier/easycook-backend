@@ -11,6 +11,8 @@ import { Lecture } from '../../lecture/entities/lecture.entity';
 export class User extends EasyCookBaseEntity {
     @Column({ length: 50 })
     name: string;
+    @Column({ type: 'boolean', default: false })
+    isEmailVerified: boolean;
     @Column({ length: 50 })
     surname: string;
     @Column({ length: 50, unique: true })
