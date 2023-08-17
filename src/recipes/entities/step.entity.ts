@@ -5,7 +5,7 @@ import { Recipe } from './recipe.entity';
 @Entity()
 export class Step extends EasyCookBaseEntity {
     @Column()
-    number: number;
+    index: number;
     @Column()
     explanation: string;
     @Column()

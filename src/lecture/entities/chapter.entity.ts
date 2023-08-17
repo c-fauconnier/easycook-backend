@@ -6,14 +6,14 @@ import { Paragraph } from './paragraph.entity';
 @Entity()
 export class Chapter extends EasyCookBaseEntity {
     @Column()
-    number: number;
+    index: number;
     @Column()
     title: string;
 
     @Column({ default: false })
     isCompleted: boolean;
     @Column({ nullable: true })
-    video?: string;
+    media?: string;
     @ManyToOne(() => Lecture, (lecture) => lecture.chapters)
     lecture: Lecture;
     @OneToMany(() => Paragraph, (paragraph) => paragraph.chapter, { eager: true, cascade: true })

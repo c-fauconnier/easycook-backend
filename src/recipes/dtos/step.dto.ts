@@ -1,5 +1,5 @@
 export class StepDto {
-    number: number;
+    index: number;
     explanation: string;
     title: string;
     duration: number;

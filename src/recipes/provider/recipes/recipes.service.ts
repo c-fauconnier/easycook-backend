@@ -1,6 +1,6 @@
 import { ErrorHttpStatusCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Catch, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DataSource, In, Like, Repository } from 'typeorm';
 import { Recipe } from '../../entities/recipe.entity';
 import { EasyCookBaseService } from '../../../shared/base/provider/base.service';
@@ -52,7 +52,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 return false;
             }
 
-            if (step.number < 1) {
+            if (step.index < 1) {
                 const error = new ErrorResponse(`L'étape doit avoir un numéro supérieur à 0`, 'steps');
                 this.errors.push(error);
                 return false;
@@ -73,7 +73,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
 
         return true;
     }
-    async create(dto: CreateRecipeDto, user?: any): Promise<Recipe | ErrorResponse[]> {
+    async create(dto: CreateRecipeDto, user?: any): Promise<Recipe | HttpException> {
         try {
             if (this.canCreate(dto, user)) {
                 //On crée la base de la recette
@@ -93,7 +93,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                     stepEntity.explanation = step.explanation;
                     stepEntity.title = step.title;
                     stepEntity.duration = step.duration;
-                    stepEntity.number = step.number;
+                    stepEntity.index = step.index;
                     await this.stepsRepo.save(stepEntity);
                     newSteps.push(stepEntity);
                 }
@@ -118,7 +118,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                     } else {
                         const error = new ErrorResponse(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
                         this.errors.push(error);
-                        return this.errors;
+                        throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
                     }
                 }
                 //
@@ -127,7 +127,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 //Maintenant qu'on a tous les champs de rempli on sauvegarde la création complète
                 return await this.repo.save(savedRecipe);
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (error) {
             throw error;
@@ -140,12 +140,12 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
         return true;
     }
 
-    override async findOne(id: number, user?: Token): Promise<Recipe | ErrorResponse[]> {
+    override async findOne(id: number, user?: Token): Promise<Recipe | HttpException> {
         try {
             if (this.canAccess(user)) {
                 return await this.repo.findOne({ where: { id: id }, relations: ['user'] });
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (error) {
             throw error;
@@ -168,5 +168,33 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
         this.errors = [];
 
         return true;
+    }
+
+    // async getRecipesPerPage(numberPerPage: number, indexStart: number, indexEnd: number): Promise<Recipe[]> {
+    //     try {
+    //         indexStart = indexStart - 1;
+    //         indexEnd = indexEnd - 1;
+    //         const recipes = await this.repo.find();
+    //         const recipesPerPage = recipes.slice(indexStart, indexEnd);
+    //         return recipesPerPage;
+    //     } catch (err) {
+    //         throw err;
+    //     }
+    // }
+
+    async getRecipesPerPage(page: number, limit: number): Promise<object> {
+        const offset = (page - 1) * limit;
+        const [items, totalCount] = await this.repo.findAndCount({
+            skip: offset,
+            take: limit,
+        });
+        console.log(
+            await this.repo.findAndCount({
+                skip: offset,
+                take: limit,
+            })
+        );
+        const totalPages = Math.ceil(totalCount / limit);
+        return { items, totalCount, totalPages };
     }
 }

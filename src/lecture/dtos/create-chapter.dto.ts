@@ -2,9 +2,9 @@ import { Chapter } from '../entities/chapter.entity';
 import { CreateParagraphDto } from './create-paragraph.dto';
 
 export class CreateChapterDto {
-    number: number;
+    index: number;
     title: string;
     isCompleted: boolean;
-    video?: string;
+    media?: string;
     paragraphs: CreateParagraphDto[];
 }

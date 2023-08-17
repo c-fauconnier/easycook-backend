@@ -1,5 +1,5 @@
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Body, Controller, Get, Param, Post, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { EasyCookBaseController } from 'src/shared/base/controller/base.controller';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../provider/users/users.service';
@@ -14,19 +14,19 @@ export class UsersController extends EasyCookBaseController<User> {
         super(service);
     }
 
-    // route to register a new user
+    // route pour inscrire un utilisateur
     @Post()
-    async create(@Body() dto: CreateUserDto): Promise<User | ErrorResponse[]> {
+    async create(@Body() dto: CreateUserDto): Promise<User | HttpException> {
         const createdUser = await this.service.create(dto);
-        if (isUser(createdUser)) {
-            await this.emailService.sendConfirmationEmail(createdUser.email, createdUser.nickname);
-        }
+        // if (isUser(createdUser)) {
+        //     await this.emailService.sendConfirmationEmail(createdUser.email, createdUser.nickname);
+        // }
         return createdUser;
     }
 
-    // route to get user infos based on its id
+    // route pour obtenir les données d'un utilisateur sur base de son id
     @Get(':id')
-    findUserById(@Param('id') id: string): Promise<User | ErrorResponse[]> {
+    findUserById(@Param('id') id: string): Promise<User | HttpException> {
         return this.service.findOne(id);
     }
 }

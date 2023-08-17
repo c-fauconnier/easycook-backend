@@ -1,4 +1,4 @@
-import { Catch, Injectable } from '@nestjs/common';
+import { Catch, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EasyCookBaseService } from '../../../shared/base/provider/base.service';
 import { User } from '../../entities/user.entity';
 import { Token } from 'src/users/interfaces/token.interface';
@@ -40,14 +40,14 @@ export class UsersService extends EasyCookBaseService<User> {
         }
         return true;
     }
-    async create(dto: CreateUserDto, user?: Token): Promise<User | ErrorResponse[]> {
+    async create(dto: CreateUserDto, user?: Token): Promise<User | HttpException> {
         try {
             if (await this.canSignUp(dto, user)) {
                 const hash = await (await argon2).hash(dto.password);
                 dto.password = hash;
                 return this.repo.save(dto);
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;

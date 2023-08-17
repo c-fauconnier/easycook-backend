@@ -2,7 +2,7 @@ import { BaseService } from '../../interfaces/base-service.interface';
 import { EasyCookBaseEntity } from '../entity/base.entity';
 import { DeleteResult, FindOptionsWhere, Repository, UpdateResult } from 'typeorm';
 import { ErrorResponse } from '../../models/error-response';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Token } from 'src/users/interfaces/token.interface';
 
 /**
@@ -34,12 +34,12 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param user [optional] certaines requêtes peuvent être faites par un type d'utilisateur uniquement.
      * @returns l'objet inséré ou une erreur
      */
-    async create(dto: T | T[] | any, user?: Token): Promise<T | ErrorResponse[]> {
+    async create(dto: T | T[] | any, user?: Token): Promise<T | HttpException> {
         try {
             if (this.canCreate(dto, user)) {
                 return await this.repository.save(dto);
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;
@@ -61,12 +61,12 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param user [optional] certaines requêtes peuvent être faites par un type d'utilisateur uniquement.
      * @returns liste de toutes les entités ou une liste d'erreurs
      */
-    async findAll(user?: Token): Promise<T[] | ErrorResponse[]> {
+    async findAll(user?: Token): Promise<T[] | HttpException> {
         try {
             if (this.canAccessToAll(user)) {
                 return await this.repository.find();
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;
@@ -89,12 +89,14 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param user [optional] certaines requêtes peuvent être faites par un type d'utilisateur uniquement.
      * @returns une entité précise
      */
-    async findOne(id: string | number, user?: Token): Promise<T | ErrorResponse[]> {
+    async findOne(id: string | number, user?: Token): Promise<T | HttpException> {
         try {
             if (this.canAccess(user)) {
                 return await this.repository.findOne({ where: { id: id } as FindOptionsWhere<unknown> });
             } else {
-                return this.errors;
+                //                 throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
+
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;
@@ -117,12 +119,12 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param user [optional] certaines requêtes peuvent être faites par un type d'utilisateur uniquement.
      * @returns la modification
      */
-    async update(id: string, dto: any, user?: Token): Promise<UpdateResult | ErrorResponse[]> {
+    async update(id: string, dto: any, user?: Token): Promise<UpdateResult | HttpException> {
         try {
             if (this.canUpdate(user)) {
                 return await this.repository.update(id, dto);
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;
@@ -145,17 +147,22 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param user [optional] certaines requêtes peuvent être faites par un type d'utilisateur uniquement.
      * @returns la suppression
      */
-    async delete(id: string, user?: Token): Promise<DeleteResult | ErrorResponse[]> {
+    async delete(id: string, user?: Token): Promise<DeleteResult | HttpException> {
         try {
             if (this.canDelete(user)) {
                 return await this.repository.delete(id);
             } else {
-                return this.errors;
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
         } catch (err) {
             throw err;
         }
     }
+
+    // async getItems(user?: User, page: number, number: number): Promise<T | HttpException> {
+    //     try {
+    //     } catch (err) {}
+    // }
 
     /**
      * Créer une nouvelle erreur dans le tableau des erreurs

@@ -7,6 +7,9 @@ import { jwtConstants } from 'src/auth/auth/constants';
 export class ConfirmEmailController {
     constructor(private readonly userService: UsersService) {}
 
+    /*
+     * route qui reçoit un token pour valider un mail
+     */
     @Get('confirm-email')
     async confirmEmail(@Query('token') token: string): Promise<string> {
         try {
