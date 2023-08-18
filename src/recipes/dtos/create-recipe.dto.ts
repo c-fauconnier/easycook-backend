@@ -6,6 +6,7 @@ export class CreateRecipeDto {
     description: string;
     difficulty: number;
     likes: number | null;
+    media: string | null;
     steps: StepDto[];
     ingredients: IngredientDto[];
     name: string;

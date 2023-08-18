@@ -9,6 +9,8 @@ import { RecipesModule } from './recipes/recipes.module';
 import { LectureModule } from './lecture/lecture.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfirmEmailModule } from './confirm-email/confirm-email.module';
+import { UploadModule } from './shared/upload/upload.module';
+import * as dotenv from 'dotenv';
 
 @Module({
     imports: [
@@ -17,10 +19,10 @@ import { ConfirmEmailModule } from './confirm-email/confirm-email.module';
             type: 'postgres',
             host: 'localhost',
             port: 5432,
-            username: 'easycook',
-            password: 'jS1AUG2PPvFt2L',
+            username: process.env.USERNAME_POSTGRESQL,
+            password: process.env.PASSWORD_POSTGRESQL,
             //A définir
-            database: 'easycook',
+            database: process.env.DATABASE,
             //Ne peut être activé pour la production.
             //Les migrations sont nécessaires pour la production.
             synchronize: true,
@@ -32,6 +34,7 @@ import { ConfirmEmailModule } from './confirm-email/confirm-email.module';
         LectureModule,
         AuthModule,
         ConfirmEmailModule,
+        UploadModule,
     ],
     controllers: [AppController],
     providers: [AppService],

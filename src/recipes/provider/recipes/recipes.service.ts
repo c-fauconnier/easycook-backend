@@ -83,6 +83,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 recipe.difficulty = dto.difficulty;
                 recipe.likes = dto.likes;
                 recipe.steps = [];
+                recipe.media = dto.media;
                 recipe.ingredients = [];
                 //On sauvegarde dans la db
                 let savedRecipe = await this.repo.save(recipe);

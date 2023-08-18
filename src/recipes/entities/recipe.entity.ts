@@ -15,6 +15,8 @@ export class Recipe extends EasyCookBaseEntity {
     difficulty: number;
     @Column({ nullable: true, default: null })
     likes: number | null;
+    @Column({ nullable: true })
+    media: string;
     @Column({ default: false })
     isValid: boolean;
     @ManyToOne(() => User, (user) => user.recipes)

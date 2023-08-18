@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfirmEmailController } from './controller/confirm-email.controller';
-import { ConfirmEmailService } from './service/confirm-email.service';
+import { ConfirmEmailService } from './provider/confirm-email.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/provider/users/users.service';
 

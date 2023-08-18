@@ -5,7 +5,7 @@ import { User } from '../entities/user.entity';
 import { UsersService } from '../provider/users/users.service';
 import { ErrorResponse } from '../../shared/models/error-response';
 import { CreateUserDto } from '../interfaces/create-user.dto';
-import { ConfirmEmailService } from 'src/confirm-email/service/confirm-email.service';
+import { ConfirmEmailService } from 'src/confirm-email/provider/confirm-email.service';
 import { isUser } from 'src/shared/validators/user.validator';
 
 @Controller('users')
