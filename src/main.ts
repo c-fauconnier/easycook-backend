@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import { initializeFirebaseApp } from 'config/firebase.config';
+import { initializeFirebaseApp } from 'src/config/firebase.config';
 
 initializeFirebaseApp();
 
