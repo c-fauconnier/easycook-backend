@@ -17,8 +17,8 @@ import * as dotenv from 'dotenv';
         ConfigModule.forRoot(),
         TypeOrmModule.forRoot({
             type: 'postgres',
-            host: 'localhost',
-            port: 5432,
+            host: process.env.HOST,
+            port: +process.env.POSTGRES_PORT,
             username: process.env.USERNAME_POSTGRESQL,
             password: process.env.PASSWORD_POSTGRESQL,
             //A définir
