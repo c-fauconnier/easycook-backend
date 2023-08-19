@@ -10,7 +10,7 @@ export class ConfirmEmailService {
     async sendConfirmationEmail(email: string, nickname: string) {
         const token = jwt.sign({ email }, jwtConstants.secret, { expiresIn: '1d' });
 
-        const confirmationLink = `http://localhost:4200/confirm-email?token=${token}`;
+        const confirmationLink = `${process.env.API_URL}/confirm-email?token=${token}`;
 
         await this.mailerService.sendMail({
             to: email,

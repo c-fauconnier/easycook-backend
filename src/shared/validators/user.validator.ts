@@ -1,6 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
-import { ErrorResponse } from '../models/error-response';
+import { HttpException } from '@nestjs/common';
 
-export function isUser(response: User | ErrorResponse[]): response is User {
+export function isUser(response: User | HttpException): response is User {
     return response instanceof User;
 }
