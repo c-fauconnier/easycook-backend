@@ -15,6 +15,6 @@ async function bootstrap() {
         allowedHeaders: ['Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization'],
         exposedHeaders: ['Content-Disposition'],
     });
-    await app.listen(process.env.PORT);
+    await app.listen(process.env.PORT || '0.0.0.0');
 }
-bootstrap();
+export default bootstrap();

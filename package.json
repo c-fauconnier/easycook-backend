@@ -1,8 +1,8 @@
 {
     "name": "easy-cook-nestjs",
-    "version": "0.0.1",
+    "version": "0.9",
     "description": "",
-    "author": "",
+    "author": "c-fauconnier",
     "private": true,
     "license": "UNLICENSED",
     "scripts": {
