@@ -1,5 +1,4 @@
 import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UsersService } from '../../../users/provider/users/users.service';
 import { User } from '../../../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -56,8 +55,8 @@ export class AuthService {
     }
 
     // Envoi d'un mail avec un lien pour changer son mot de passe
-    async sendPasswordResetEmail(email): Promise<User | HttpException> {
-        const user = await this.usersRepo.findOne({ where: { email: email } });
+    async sendPasswordResetEmail(email: string): Promise<User | HttpException> {
+        const user = await this.findByEmail(email);
 
         if (!user) {
             return new HttpException('Email introuvable', HttpStatus.NOT_FOUND);
@@ -68,10 +67,10 @@ export class AuthService {
 
         await this.mailerService.sendMail({
             to: email,
-            subject: 'Réinitialisation de mot de passe',
+            subject: 'Changement de mot de passe',
             html: `
             <!DOCTYPE html>
-            <html lang="fr">
+            <html>
             <head>
               <meta charset="UTF-8">
               <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -90,8 +89,7 @@ export class AuthService {
             </body>
             </html>
             `,
-            //context: { nickname:nickname, confirmationLink: confirmationLink },
-            encoding: 'UTF-8',
+            encoding: 'UTF-8', // Définir l'encodage UTF-8
         });
 
         return user;

@@ -1,7 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { AuthService } from '../providers/auth.service';
 import * as jwt from 'jsonwebtoken';
 import { jwtConstants } from 'src/auth/auth/constants';
+import { User } from 'src/users/entities/user.entity';
 const argon2 = require('argon2');
 
 @Controller('auth')
@@ -15,12 +16,12 @@ export class AuthController {
     }
 
     @Post('forgotPassword')
-    sendPasswordResetEmail(@Body() email: string) {
-        return this.authService.sendPasswordResetEmail(email);
+    async sendPasswordResetEmail(@Body('email') email: string): Promise<User | HttpException> {
+        return await this.authService.sendPasswordResetEmail(email);
     }
 
     @Post('resetPassword')
-    async resetPassword(@Query('token') token: string, @Body() password: string) {
+    async resetPassword(@Query('token') token: string, @Body('password') password: string): Promise<User | string> {
         try {
             const decodedToken = jwt.verify(token, jwtConstants.secret) as { email: string };
             const user = await this.authService.findByEmail(decodedToken.email);
