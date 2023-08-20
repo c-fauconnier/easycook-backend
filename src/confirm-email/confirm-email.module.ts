@@ -11,15 +11,18 @@ import { UsersService } from 'src/users/provider/users/users.service';
         TypeOrmModule.forFeature([User]),
         ConfirmEmailModule,
         MailerModule.forRootAsync({
-            useFactory: () => ({
+            useFactory: async () => ({
                 transport: {
-                    service: 'SendGrid', // Utilisez le service SendGrid
+                    host: 'smtp.sendgrid.net',
+                    port: 587,
                     auth: {
-                        api_key: process.env.SENDGRID_API_KEY, // Utilisez la variable d'environnement
+                        user: 'apikey', // SendGrid API key
+                        pass: process.env.SENDGRID_API_KEY,
                     },
                 },
                 defaults: {
-                    from: process.env.SENDER_EMAIL, // Utilisez la variable d'environnement
+                    from: process.env.SENDER_EMAIL,
+                    textEncoding: 'utf-8',
                 },
             }),
         }),

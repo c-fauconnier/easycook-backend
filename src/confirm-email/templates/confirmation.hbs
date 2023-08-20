@@ -1,10 +1,30 @@
 <html>
     <head>
+        <meta charset='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         <title>Confirmation d'inscription</title>
     </head>
-    <body>
-        <h1>Bienvenue, {{nickname}} !</h1>
-        <p>Veuillez cliquer sur le lien ci-dessous pour confirmer votre inscription :</p>
-        <a href='{{confirmationLink}}'>Confirmer mon e-mail</a>
+    <body style='font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;'>
+        <table style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff;'>
+            <tr>
+                <td style='text-align: center; padding: 20px 0;'>
+                    <h1>Confirmation d'inscription</h1>
+                </td>
+            </tr>
+            <tr>
+                <td style='padding: 20px;'>
+                    <p>Bonjour {{nickname}},</p>
+                    <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour confirmer votre compte :</p>
+                    <p><a href='{{confirmationLink}}'>Confirmer mon compte</a></p>
+                    <p>Merci,</p>
+                    <p>L'équipe de notre application.</p>
+                </td>
+            </tr>
+            <tr>
+                <td style='background-color: #f4f4f4; padding: 10px; text-align: center;'>
+                    <p style='margin: 0;'>Ceci est un e-mail automatique. Veuillez ne pas y répondre.</p>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
