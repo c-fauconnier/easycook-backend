@@ -2,11 +2,16 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 import { ErrorResponse } from '../../models/error-response';
 import { EasyCookBaseEntity } from '../entity/base.entity';
 import { EasyCookBaseService } from '../provider/base.service';
-import { Controller, Get, Post, Delete, Put, Body, Param, UseGuards, Request, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, UseGuards, Request, HttpException, Query } from '@nestjs/common';
 import { AuthGuard } from '../../../auth/auth/auth.guard';
 
 export class EasyCookBaseController<T extends EasyCookBaseEntity> {
     constructor(public service: EasyCookBaseService<T>) {}
+
+    @Get('search')
+    getByName(@Query('key') key: string, @Query('value') value: string): Promise<T[]> {
+        return this.service.getByName(key, value);
+    }
 
     @UseGuards(AuthGuard)
     @Post()

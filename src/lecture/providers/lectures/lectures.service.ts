@@ -24,13 +24,13 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
     canCreate(dto: CreateLectureDto, user?: Token): boolean {
         this.errors = [];
         if (user.role != 'admin') {
-            return this.generateNewError('Vous devez être connecté pour créer un cours', 'user');
+            this.generateNewError('Vous devez être connecté pour créer un cours', 'user');
         }
         if (dto.duration <= 0) {
-            return this.generateNewError('La durée du cours doit être définie', 'duration');
+            this.generateNewError('La durée du cours doit être définie', 'duration');
         }
         if (dto.difficulty < 0 || dto.difficulty > 5) {
-            return this.generateNewError('La difficulté du cours doit être comprise entre 0 et 5', 'difficulty');
+            this.generateNewError('La difficulté du cours doit être comprise entre 0 et 5', 'difficulty');
         }
 
         //Lorsque la connexion marche
@@ -38,7 +38,7 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
             this.generateNewError(`L'auteur doit être défini`, 'userId');
         }
         if (dto.chapters.length < 1) {
-            return this.generateNewError('Le cours doit avoir au moins un chapitre', 'chapters');
+            this.generateNewError('Le cours doit avoir au moins un chapitre', 'chapters');
         }
 
         dto.chapters.sort((a, b) => a.index - b.index);
@@ -47,16 +47,16 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
         for (let i = 0; i < dto.chapters.length; i++) {
             if ((i = 0)) {
                 if (dto.chapters[i].index !== 1) {
-                    return this.generateNewError('Le premier chapitre doit avoir le numéro 1', 'chapters');
+                    this.generateNewError('Le premier chapitre doit avoir le numéro 1', 'chapters');
                 }
             }
 
             if (dto.chapters[i].isCompleted)
-                return this.generateNewError(`Le ou les chapitres ne peut(vent) être complété(s) à la création`, `chapters`);
+                this.generateNewError(`Le ou les chapitres ne peut(vent) être complété(s) à la création`, `chapters`);
 
-            if (dto.chapters[i].index > 1) return this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
+            if (dto.chapters[i].index > 1) this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
 
-            if (dto.chapters[i].index !== lastNumber + 1) return this.generateNewError(`L'ordre des chapitres est erroné`, 'chapters');
+            if (dto.chapters[i].index !== lastNumber + 1) this.generateNewError(`L'ordre des chapitres est erroné`, 'chapters');
 
             lastNumber++;
 
@@ -67,22 +67,22 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
             for (let j = 0; j < dto.chapters[i].paragraphs.length; j++) {
                 if (j === 0) {
                     if (dto.chapters[i].paragraphs[j].index !== 1) {
-                        return this.generateNewError('Le premier paragraphe doit avoir l index 1', 'paragraphs');
+                        this.generateNewError('Le premier paragraphe doit avoir l index 1', 'paragraphs');
                     }
                 }
 
                 if (dto.chapters[i].paragraphs[j].index < 1) {
-                    return this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
+                    this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
                 }
 
                 if (dto.chapters[i].paragraphs[j].index !== lastParagraphNumber + 1) {
-                    return this.generateNewError(`L'ordre des paragraphes est erroné`, 'paragraphs');
+                    this.generateNewError(`L'ordre des paragraphes est erroné`, 'paragraphs');
                 }
 
                 lastParagraphNumber++;
             }
         }
-        return true;
+        return this.hasError();
     }
 
     override async create(dto: CreateLectureDto, user?: Token): Promise<Lecture | HttpException> {

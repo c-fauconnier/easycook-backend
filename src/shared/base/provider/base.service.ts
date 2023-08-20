@@ -1,6 +1,6 @@
 import { BaseService } from '../../interfaces/base-service.interface';
 import { EasyCookBaseEntity } from '../entity/base.entity';
-import { DeleteResult, FindOptionsWhere, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, FindOptionsWhere, ILike, Like, Repository, UpdateResult } from 'typeorm';
 import { ErrorResponse } from '../../models/error-response';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Token } from 'src/users/interfaces/token.interface';
@@ -170,10 +170,25 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
      * @param source La source de l'erreur
      * @returns renvoie false et donc impossible d'exécuter les méthodes de businness logic
      */
-    generateNewError(message: string, source: string): boolean {
+    generateNewError(message: string, source: string): void {
         if (!message || !source) return;
         const error = new ErrorResponse(message, source);
         this.errors.push(error);
-        return false;
+    }
+
+    async getByName(key: string, value: string): Promise<T[]> {
+        try {
+            return await this.repository.find({ where: { [key as string]: Like(`%${value}%`) } as FindOptionsWhere<unknown> });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    /**
+     * Permet de vérifier si il y a des erreurs dans le tableau d'erreurs.
+     * @returns `vrai` si le tableau d'erreurs n'est pas vide.
+     */
+    hasError(): boolean {
+        return !(this.errors.length > 0);
     }
 }

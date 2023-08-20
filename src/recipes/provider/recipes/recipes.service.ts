@@ -27,51 +27,37 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
         this.errors = [];
 
         //! UNCOMMENT ONCE USERS ARE CREATED
-        // if (user.isRestricted) {
-        //     const error = new ErrorResponse(`Vous ne pouvez pas créer de recette car vous êtes restreint`, 'user');
-        //     this.errors.push(error);
-        //     return false;
-        // }
+        if (user.isRestricted) {
+            this.generateNewError(`Vous ne pouvez pas créer de recette car vous êtes restreint`, 'user');
+        }
 
         if (dto.ingredients.length < 1) {
-            const error = new ErrorResponse(`La recette doit avoir au moins un ingrédient`, 'ingredients');
-            this.errors.push(error);
-            return false;
+            this.generateNewError(`La recette doit avoir au moins un ingrédient`, 'ingredients');
         }
 
         if (dto.steps.length < 1) {
-            const error = new ErrorResponse(`La recette doit avoir au moins une étape`, 'steps');
-            this.errors.push(error);
-            return false;
+            this.generateNewError(`La recette doit avoir au moins une étape`, 'steps');
         }
 
         for (const step of dto.steps) {
             if (step.duration <= 0) {
-                const error = new ErrorResponse(`L'étape doit avoir une durée supérieure à 0`, 'steps');
-                this.errors.push(error);
-                return false;
+                this.generateNewError(`L'étape doit avoir une durée supérieure à 0`, 'steps');
             }
 
             if (step.index < 1) {
-                const error = new ErrorResponse(`L'étape doit avoir un numéro supérieur à 0`, 'steps');
-                this.errors.push(error);
-                return false;
+                this.generateNewError(`L'étape doit avoir un numéro supérieur à 0`, 'steps');
             }
         }
 
         if (dto.difficulty > 5 || dto.difficulty < 0) {
-            const error = new ErrorResponse(`La difficulté doit être plus grande ou égale à 0 et inférieure ou égale à 5`, 'difficulty');
-            this.errors.push(error);
-            return false;
+            this.generateNewError(`La difficulté doit être plus grande ou égale à 0 et inférieure ou égale à 5`, 'difficulty');
         }
 
         if (dto.likes !== 0) {
-            const error = new ErrorResponse(`Une recette ne peut commencer qu'avec 0 likes`, 'likes');
-            this.errors.push(error);
-            return false;
+            this.generateNewError(`Une recette ne peut commencer qu'avec 0 likes`, 'likes');
         }
 
-        return true;
+        return this.hasError();
     }
     async create(dto: CreateRecipeDto, user?: any): Promise<Recipe | HttpException> {
         try {
@@ -89,6 +75,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 let savedRecipe = await this.repo.save(recipe);
                 //On créée les étapes
                 let newSteps: Step[] = [];
+
                 for (const step of dto.steps) {
                     let stepEntity = new Step();
                     stepEntity.explanation = step.explanation;
@@ -103,11 +90,13 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 //Il faut donc que les ingrédients existent déjà
                 //On va créer un record dans la table de liaison, elle lie un ingrédient à une recette
                 let newIngredients: RecipeIngredient[] = [];
+
                 for (const ingredient of dto.ingredients) {
                     const foundIngredient = await this.ingredientsRepo.findOne({
                         where: { name: ingredient.name },
                         relations: ['recipes'],
                     });
+                    
                     if (foundIngredient) {
                         let riEntity = new RecipeIngredient();
                         riEntity.quantity = ingredient.quantity;
@@ -117,8 +106,8 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                         await this.ingredientsRepo.save(foundIngredient);
                         newIngredients.push(riEntity);
                     } else {
-                        const error = new ErrorResponse(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
-                        this.errors.push(error);
+                        this.generateNewError(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
+
                         throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
                     }
                 }
@@ -156,19 +145,19 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
     canAccessToAll(user?: Token): boolean {
         this.errors = [];
 
-        return true;
+        return this.hasError();
     }
 
     canDelete(user?: Token): boolean {
         this.errors = [];
 
-        return true;
+        return this.hasError();
     }
 
     canUpdate(user?: Token): boolean {
         this.errors = [];
 
-        return true;
+        return this.hasError();
     }
 
     // async getRecipesPerPage(numberPerPage: number, indexStart: number, indexEnd: number): Promise<Recipe[]> {
@@ -189,12 +178,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
             skip: offset,
             take: limit,
         });
-        console.log(
-            await this.repo.findAndCount({
-                skip: offset,
-                take: limit,
-            })
-        );
+        
         const totalPages = Math.ceil(totalCount / limit);
         return { items, totalCount, totalPages };
     }

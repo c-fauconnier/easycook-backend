@@ -5,8 +5,9 @@ import { Token } from 'src/users/interfaces/token.interface';
 import { CreateUserDto } from 'src/users/interfaces/create-user.dto';
 import { ErrorResponse } from 'src/shared/models/error-response';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
+import { Role } from 'src/shared/enums/role.enum';
 
 const argon2 = require('argon2');
 
@@ -25,20 +26,23 @@ export class UsersService extends EasyCookBaseService<User> {
         const emailRegex = new RegExp('[a-z0-9]+@[a-z]+.[a-z]{2,3}');
 
         if (!emailRegex.test(dto.email)) {
-            return this.generateNewError(`L'adresse email est invalide`, 'email');
+            console.log('invalid');
+
+            this.generateNewError(`L'adresse email est invalide.`, 'email');
         }
 
         const isEmailUnique = await this.verifyEmailUnicity(dto.email);
 
         if (!isEmailUnique) {
-            return this.generateNewError(`L'adresse email est déjà prise.`, 'email');
+            this.generateNewError(`L'adresse email est déjà prise.`, 'email');
         }
         const isNicknameUnique = await this.verifyNicknameUnicity(dto.nickname);
 
         if (!isNicknameUnique) {
-            return this.generateNewError(`Le pseudonyme est déjà pris.`, 'nickname');
+            this.generateNewError(`Le pseudonyme est déjà pris.`, 'nickname');
         }
-        return true;
+
+        return this.hasError();
     }
     async create(dto: CreateUserDto, user?: Token): Promise<User | HttpException> {
         try {
@@ -61,7 +65,11 @@ export class UsersService extends EasyCookBaseService<User> {
 
     canAccessToAll(user?: Token): boolean {
         this.errors = [];
-        return true;
+
+        if (user.role !== Role.Admin) {
+            this.generateNewError(`Vous ne pouvez pas accéder à ce service`, `user`);
+        }
+        return this.hasError();
     }
 
     canUpdate(user?: Token): boolean {
@@ -69,9 +77,32 @@ export class UsersService extends EasyCookBaseService<User> {
         return true;
     }
 
+    async canDeleteUser(targetId: string, user?: Token): Promise<boolean> {
+        try {
+            this.errors = [];
+
+            if (!(await this.isUserOrAdmin(user, targetId))) this.generateNewError(`Vous ne pouvez pas supprimer cet utilisateur.`, `user`);
+
+            return this.hasError();
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async delete(id: string, user?: Token): Promise<DeleteResult | HttpException> {
+        try {
+            if (await this.canDeleteUser(id, user)) {
+                return await this.repo.delete(id);
+            } else {
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
+            }
+        } catch (err) {
+            throw err;
+        }
+    }
+
     canDelete(user?: Token): boolean {
-        this.errors = [];
-        return true;
+        return false;
     }
 
     async verifyEmailUnicity(email: string): Promise<boolean> {
@@ -89,5 +120,11 @@ export class UsersService extends EasyCookBaseService<User> {
     async findByEmail(email: string): Promise<User> {
         const user = await this.repo.findOne({ where: { email: email } });
         return user;
+    }
+
+    async isUserOrAdmin(user: Token, userTargetId: string): Promise<boolean> {
+        const target = await this.repo.findOne({ where: { id: +userTargetId } });
+
+        return user.role === Role.Admin || user.id === target.id.toString() ? true : false;
     }
 }
