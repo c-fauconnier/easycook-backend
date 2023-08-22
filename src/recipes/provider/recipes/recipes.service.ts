@@ -31,21 +31,21 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
             this.generateNewError(`Vous ne pouvez pas créer de recette car vous êtes restreint`, 'user');
         }
 
-        if (dto.ingredients.length < 1) {
-            this.generateNewError(`La recette doit avoir au moins un ingrédient`, 'ingredients');
-        }
+        // if (!dto.ingredients || dto.ingredients.length < 1) {
+        //     this.generateNewError(`La recette doit avoir au moins un ingrédient`, 'ingredients');
+        // } ! A reutiliser lorsque les ingrédients sont prêts dans le front
 
         if (dto.steps.length < 1) {
             this.generateNewError(`La recette doit avoir au moins une étape`, 'steps');
         }
 
         for (const step of dto.steps) {
-            if (step.duration <= 0) {
-                this.generateNewError(`L'étape doit avoir une durée supérieure à 0`, 'steps');
-            }
+            // if (!step.duration || step.duration <= 0) {
+            //     this.generateNewError(`L'étape doit avoir une durée supérieure à 0 ( Etape ${step.index})`, 'steps');
+            // } ! A modifier si les étapes intègrent une notion de durée !
 
             if (step.index < 1) {
-                this.generateNewError(`L'étape doit avoir un numéro supérieur à 0`, 'steps');
+                this.generateNewError(`L'étape doit avoir un numéro supérieur à 0 (Etape ${step.index})`, 'steps');
             }
         }
 
@@ -70,7 +70,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 recipe.likes = dto.likes;
                 recipe.steps = [];
                 recipe.media = dto.media;
-                recipe.ingredients = [];
+                //recipe.ingredients = [];
                 //On sauvegarde dans la db
                 let savedRecipe = await this.repo.save(recipe);
                 //On créée les étapes
@@ -80,7 +80,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                     let stepEntity = new Step();
                     stepEntity.explanation = step.explanation;
                     stepEntity.title = step.title;
-                    stepEntity.duration = step.duration;
+                    //stepEntity.duration = step.duration;
                     stepEntity.index = step.index;
                     await this.stepsRepo.save(stepEntity);
                     newSteps.push(stepEntity);
@@ -89,31 +89,31 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 //Pour chaque ingrédient on va récupérer son entité correspondante
                 //Il faut donc que les ingrédients existent déjà
                 //On va créer un record dans la table de liaison, elle lie un ingrédient à une recette
-                let newIngredients: RecipeIngredient[] = [];
+                //let newIngredients: RecipeIngredient[] = [];
 
-                for (const ingredient of dto.ingredients) {
-                    const foundIngredient = await this.ingredientsRepo.findOne({
-                        where: { name: ingredient.name },
-                        relations: ['recipes'],
-                    });
-                    
-                    if (foundIngredient) {
-                        let riEntity = new RecipeIngredient();
-                        riEntity.quantity = ingredient.quantity;
-                        riEntity.unit = ingredient.unit;
-                        const savedRiEntity = await this.riRepo.save(riEntity);
-                        foundIngredient.recipes.push(savedRiEntity);
-                        await this.ingredientsRepo.save(foundIngredient);
-                        newIngredients.push(riEntity);
-                    } else {
-                        this.generateNewError(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
+                // for (const ingredient of dto.ingredients) {
+                //     const foundIngredient = await this.ingredientsRepo.findOne({
+                //         where: { name: ingredient.name },
+                //         relations: ['recipes'],
+                //     });
 
-                        throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
-                    }
-                }
+                //     if (foundIngredient) {
+                //         let riEntity = new RecipeIngredient();
+                //         riEntity.quantity = ingredient.quantity;
+                //         riEntity.unit = ingredient.unit;
+                //         const savedRiEntity = await this.riRepo.save(riEntity);
+                //         foundIngredient.recipes.push(savedRiEntity);
+                //         await this.ingredientsRepo.save(foundIngredient);
+                //         newIngredients.push(riEntity);
+                //     } else {
+                //         this.generateNewError(`L'ingrédient ${ingredient.name} n'existe pas`, 'ingredients');
+
+                //         throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
+                //     }
+                // }
                 //
                 //
-                savedRecipe.ingredients = newIngredients;
+                //savedRecipe.ingredients = newIngredients;
                 //Maintenant qu'on a tous les champs de rempli on sauvegarde la création complète
                 return await this.repo.save(savedRecipe);
             } else {
@@ -178,7 +178,7 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
             skip: offset,
             take: limit,
         });
-        
+
         const totalPages = Math.ceil(totalCount / limit);
         return { items, totalCount, totalPages };
     }

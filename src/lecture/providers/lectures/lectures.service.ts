@@ -8,7 +8,7 @@ import { CreateLectureDto } from '../../dtos/create-lecture.dto';
 import { ErrorResponse } from '../../../shared/models/error-response';
 import { Chapter } from '../../entities/chapter.entity';
 import { Paragraph } from '../../entities/paragraph.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../../users/entities/user.entity';
 
 @Injectable()
 export class LecturesService extends EasyCookBaseService<Lecture> {

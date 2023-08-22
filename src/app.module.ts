@@ -10,6 +10,7 @@ import { LectureModule } from './lecture/lecture.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfirmEmailModule } from './confirm-email/confirm-email.module';
 import { UploadModule } from './shared/upload/upload.module';
+import { PostModule } from './post/post.module';
 import * as dotenv from 'dotenv';
 
 @Module({
@@ -35,6 +36,7 @@ import * as dotenv from 'dotenv';
         AuthModule,
         ConfirmEmailModule,
         UploadModule,
+        PostModule,
     ],
     controllers: [AppController],
     providers: [AppService],

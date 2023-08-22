@@ -10,8 +10,8 @@ export class Step extends EasyCookBaseEntity {
     explanation: string;
     @Column()
     title: string;
-    @Column()
-    duration: number;
+    // @Column()
+    // duration: number;
 
     @ManyToOne(() => Recipe, (recipe) => recipe.steps)
     recipe: Recipe;

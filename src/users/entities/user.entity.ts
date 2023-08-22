@@ -6,6 +6,8 @@ import { Recipe } from '../../recipes/entities/recipe.entity';
 import { Comment } from '../../recipes/entities/comment.entity';
 import { Restriction } from './restriction.entity';
 import { Lecture } from '../../lecture/entities/lecture.entity';
+import { Post } from '../../post/entities/post.entity';
+import { LikedPost } from 'src/post/entities/likedpost.entity';
 
 @Entity()
 export class User extends EasyCookBaseEntity {
@@ -33,4 +35,8 @@ export class User extends EasyCookBaseEntity {
     lectureRate: Lecture[];
     @OneToMany(() => Restriction, (restriction) => restriction.user)
     restrictions: Restriction[];
+    @OneToMany(() => Post, (post) => post.user)
+    posts: Post[];
+    @OneToMany(() => LikedPost, (likedPost) => likedPost.user)
+    likedPosts: LikedPost[];
 }

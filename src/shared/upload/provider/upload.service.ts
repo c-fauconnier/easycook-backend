@@ -3,7 +3,7 @@ import { EasyCookBaseService } from '../../../shared/base/provider/base.service'
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { collection, addDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 @Injectable()
 export class UploadService {
@@ -21,4 +21,13 @@ export class UploadService {
         };
         return link; // Renvoie le chemin du fichier dans le stockage
     }
+
+    // async deleteFile(collection: string, path: string): Promise<void> {
+    //     console.log(path);
+    //     const storage = getStorage();
+    //     const fileRef = ref(storage, `${collection}/${path}`);
+
+    //     // Supprimer le fichier
+    //     await deleteObject(fileRef);
+    // }
 }
