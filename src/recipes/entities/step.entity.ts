@@ -13,6 +13,6 @@ export class Step extends EasyCookBaseEntity {
     // @Column()
     // duration: number;
 
-    @ManyToOne(() => Recipe, (recipe) => recipe.steps)
+    @ManyToOne(() => Recipe, (recipe) => recipe.steps, { onDelete: 'CASCADE' })
     recipe: Recipe;
 }

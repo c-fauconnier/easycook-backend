@@ -1,7 +1,7 @@
 import { ErrorHttpStatusCode } from '@nestjs/common/utils/http-error-by-code.util';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Catch, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DataSource, In, Like, Repository } from 'typeorm';
+import { Catch, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { DataSource, DeleteResult, In, Like, Repository } from 'typeorm';
 import { Recipe } from '../../entities/recipe.entity';
 import { EasyCookBaseService } from '../../../shared/base/provider/base.service';
 import { ErrorResponse } from '../../../shared/models/error-response';
@@ -10,14 +10,19 @@ import { CreateRecipeDto } from '../../dtos/create-recipe.dto';
 import { Step } from '../../entities/step.entity';
 import { RecipeIngredient } from '../../entities/recipe-ingredient.entity';
 import { Token } from '../../../users/interfaces/token.interface';
+import { FavoriteRecipe } from 'src/recipes/entities/favorite-recipe.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/shared/enums/role.enum';
 
 @Injectable()
 export class RecipesService extends EasyCookBaseService<Recipe> {
     constructor(
         @InjectRepository(Recipe) private repo: Repository<Recipe>,
+        @InjectRepository(User) private usersRepo: Repository<User>,
         @InjectRepository(Ingredient) private ingredientsRepo: Repository<Ingredient>,
         @InjectRepository(RecipeIngredient) private riRepo: Repository<RecipeIngredient>,
         @InjectRepository(Step) private stepsRepo: Repository<Step>,
+        @InjectRepository(FavoriteRecipe) private favoritesRecipesRepo: Repository<FavoriteRecipe>,
         private dataSource: DataSource
     ) {
         super(repo);
@@ -53,8 +58,12 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
             this.generateNewError(`La difficulté doit être plus grande ou égale à 0 et inférieure ou égale à 5`, 'difficulty');
         }
 
-        if (dto.likes !== 0) {
+        if (dto.likes !== 0 && dto.likes !== null) {
             this.generateNewError(`Une recette ne peut commencer qu'avec 0 likes`, 'likes');
+        }
+
+        if (dto.duration === 0) {
+            this.generateNewError(`Une recette doit avoir une durée`, 'duration');
         }
 
         return this.hasError();
@@ -70,6 +79,8 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
                 recipe.likes = dto.likes;
                 recipe.steps = [];
                 recipe.media = dto.media;
+                recipe.duration = dto.duration;
+                recipe.user = user.id;
                 //recipe.ingredients = [];
                 //On sauvegarde dans la db
                 let savedRecipe = await this.repo.save(recipe);
@@ -148,6 +159,36 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
         return this.hasError();
     }
 
+    async canDeleteRecipe(targetId: string, user?: Token): Promise<boolean> {
+        try {
+            this.errors = [];
+
+            if (!(await this.isUserOrAdmin(user, targetId))) this.generateNewError(`Vous ne pouvez pas supprimer cette recette.`, `user`);
+
+            return this.hasError();
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async isUserOrAdmin(user: Token, userTargetId: string): Promise<boolean> {
+        const target = await this.repo.findOne({ where: { id: +userTargetId }, relations: ['user'] });
+
+        return user.role === Role.Admin || user.id === target.user.id.toString() ? true : false;
+    }
+
+    async delete(id: string, user?: Token): Promise<DeleteResult | HttpException> {
+        try {
+            if (await this.canDeleteRecipe(id, user)) {
+                return await this.repo.delete(id);
+            } else {
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
+            }
+        } catch (err) {
+            throw err;
+        }
+    }
+
     canDelete(user?: Token): boolean {
         this.errors = [];
 
@@ -160,26 +201,70 @@ export class RecipesService extends EasyCookBaseService<Recipe> {
         return this.hasError();
     }
 
-    // async getRecipesPerPage(numberPerPage: number, indexStart: number, indexEnd: number): Promise<Recipe[]> {
-    //     try {
-    //         indexStart = indexStart - 1;
-    //         indexEnd = indexEnd - 1;
-    //         const recipes = await this.repo.find();
-    //         const recipesPerPage = recipes.slice(indexStart, indexEnd);
-    //         return recipesPerPage;
-    //     } catch (err) {
-    //         throw err;
-    //     }
-    // }
-
     async getRecipesPerPage(page: number, limit: number): Promise<object> {
         const offset = (page - 1) * limit;
         const [items, totalCount] = await this.repo.findAndCount({
             skip: offset,
             take: limit,
+            where: { isValid: true },
         });
 
         const totalPages = Math.ceil(totalCount / limit);
         return { items, totalCount, totalPages };
+    }
+
+    async canAddToFavorites(user: Token, id: string): Promise<boolean> {
+        try {
+            const recipeToFav = !!(await this.repo.findOne({ where: { id: +id } }));
+
+            if (!recipeToFav) {
+                this.generateNewError(`La recette n'existe pas`, `recipe`);
+            }
+            const alreadyFavorite = await this.favoritesRecipesRepo.find({ where: { user: { id: +user.id }, recipe: { id: +id } } });
+
+            if (alreadyFavorite.length) {
+                this.generateNewError(`La recette est déjà dans les favoris`, `none`);
+            }
+            return this.hasError();
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async isInMyFavorites(id: string, user: Token): Promise<boolean> {
+        try {
+            const myFavorites = await this.favoritesRecipesRepo.find({ where: { user: { id: +user.id } }, relations: ['recipe'] });
+            const isFavorite = myFavorites.find((fav) => fav.recipe.id === +id);
+            return isFavorite ? true : false;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async deleteFromMyFavorites(user: Token, id: string): Promise<DeleteResult> {
+        try {
+            const fav = await this.favoritesRecipesRepo.findOne({ where: { user: { id: +user.id }, recipe: { id: +id } } });
+            return this.favoritesRecipesRepo.delete(fav.id);
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async addToFavorites(user: Token, id: string): Promise<FavoriteRecipe | HttpException> {
+        try {
+            if (await this.canAddToFavorites(user, id)) {
+                const userToAdd = await this.usersRepo.findOne({ where: { id: +user.id } });
+                const recipeToAdd = await this.repo.findOne({ where: { id: +id } });
+                const newFavoriteRecipe = new FavoriteRecipe();
+                newFavoriteRecipe.user = userToAdd;
+                newFavoriteRecipe.recipe = recipeToAdd;
+
+                return await this.favoritesRecipesRepo.save(newFavoriteRecipe);
+            } else {
+                throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
+            }
+        } catch (err) {
+            throw err;
+        }
     }
 }

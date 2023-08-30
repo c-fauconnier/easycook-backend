@@ -5,6 +5,7 @@ export class CreateLectureDto {
     duration: number;
     description: string;
     difficulty: number;
+    media: string;
     //A enlever de l'optionnel lorsque le système de connexion marche
     authorID: number;
     chapters: CreateChapterDto[];

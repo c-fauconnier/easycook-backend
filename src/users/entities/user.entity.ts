@@ -8,6 +8,8 @@ import { Restriction } from './restriction.entity';
 import { Lecture } from '../../lecture/entities/lecture.entity';
 import { Post } from '../../post/entities/post.entity';
 import { LikedPost } from 'src/post/entities/likedpost.entity';
+import { FavoriteRecipe } from 'src/recipes/entities/favorite-recipe.entity';
+import { FavoriteLecture } from 'src/lecture/entities/favorite-lecture.entity';
 
 @Entity()
 export class User extends EasyCookBaseEntity {
@@ -25,18 +27,22 @@ export class User extends EasyCookBaseEntity {
     password: string;
     @Column({ type: 'enum', enum: Role, default: Role.User })
     role: Role;
-    @OneToMany(() => Recipe, (recipe) => recipe.user, { eager: true })
+    @OneToMany(() => Recipe, (recipe) => recipe.user, { eager: true, onDelete: 'CASCADE' })
     recipes: Recipe[];
-    @OneToMany(() => Comment, (comment) => comment.author, { eager: true })
+    @OneToMany(() => Comment, (comment) => comment.author, { eager: true, onDelete: 'CASCADE' })
     comments: Comment[];
-    @OneToMany(() => Lecture, (lecture) => lecture.author)
+    @OneToMany(() => Lecture, (lecture) => lecture.author, { onDelete: 'CASCADE' })
     lectures: Lecture[];
-    @OneToMany(() => Lecture, (lecture) => lecture.rating)
+    @OneToMany(() => Lecture, (lecture) => lecture.rating, { onDelete: 'CASCADE' })
     lectureRate: Lecture[];
-    @OneToMany(() => Restriction, (restriction) => restriction.user)
+    @OneToMany(() => Restriction, (restriction) => restriction.user, { onDelete: 'CASCADE' })
     restrictions: Restriction[];
-    @OneToMany(() => Post, (post) => post.user)
+    @OneToMany(() => Post, (post) => post.user, { onDelete: 'CASCADE' })
     posts: Post[];
-    @OneToMany(() => LikedPost, (likedPost) => likedPost.user)
+    @OneToMany(() => LikedPost, (likedPost) => likedPost.user, { onDelete: 'CASCADE' })
     likedPosts: LikedPost[];
+    @OneToMany(() => FavoriteRecipe, (favoriteRecipe) => favoriteRecipe.user, { eager: true, onDelete: 'CASCADE' })
+    favoriteRecipes: FavoriteRecipe[];
+    @OneToMany(() => FavoriteLecture, (favoriteLecture) => favoriteLecture.user, { eager: true, onDelete: 'CASCADE' })
+    favoriteLectures: FavoriteLecture[];
 }

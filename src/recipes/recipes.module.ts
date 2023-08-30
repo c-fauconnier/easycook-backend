@@ -9,10 +9,12 @@ import { RecipesService } from './provider/recipes/recipes.service';
 import { IngredientsController } from './controller/ingredients/ingredients.controller';
 import { IngredientsService } from './provider/ingredients/ingredients.service';
 import { Comment } from './entities/comment.entity';
+import { FavoriteRecipe } from './entities/favorite-recipe.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
     controllers: [RecipesController, IngredientsController],
     providers: [RecipesService, IngredientsService],
-    imports: [TypeOrmModule.forFeature([Recipe, Step, RecipeIngredient, Ingredient, Comment])],
+    imports: [TypeOrmModule.forFeature([Recipe, Step, RecipeIngredient, Ingredient, User, Comment, FavoriteRecipe])],
 })
 export class RecipesModule {}

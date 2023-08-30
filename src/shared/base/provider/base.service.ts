@@ -64,7 +64,7 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
     async findAll(user?: Token): Promise<T[] | HttpException> {
         try {
             if (this.canAccessToAll(user)) {
-                return await this.repository.find();
+                return await this.repository.find({ order: { id: 'ASC' } as FindOptionsWhere<unknown> });
             } else {
                 throw new HttpException({ errors: this.errors }, HttpStatus.BAD_REQUEST);
             }
@@ -178,7 +178,7 @@ export abstract class EasyCookBaseService<T extends EasyCookBaseEntity> implemen
 
     async getByName(key: string, value: string): Promise<T[]> {
         try {
-            return await this.repository.find({ where: { [key as string]: Like(`%${value}%`) } as FindOptionsWhere<unknown> });
+            return await this.repository.find({ where: { [key as string]: ILike(`%${value}%`) } as FindOptionsWhere<unknown> });
         } catch (err) {
             throw err;
         }

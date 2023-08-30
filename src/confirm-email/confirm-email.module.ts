@@ -5,10 +5,12 @@ import { ConfirmEmailController } from './controller/confirm-email.controller';
 import { ConfirmEmailService } from './provider/confirm-email.service';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/provider/users/users.service';
+import { FavoriteRecipe } from 'src/recipes/entities/favorite-recipe.entity';
+import { FavoriteLecture } from 'src/lecture/entities/favorite-lecture.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, FavoriteRecipe, FavoriteLecture]),
         ConfirmEmailModule,
         MailerModule.forRootAsync({
             useFactory: async () => ({

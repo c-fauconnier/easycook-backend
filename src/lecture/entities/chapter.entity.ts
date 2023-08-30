@@ -14,8 +14,8 @@ export class Chapter extends EasyCookBaseEntity {
     isCompleted: boolean;
     @Column({ nullable: true })
     media?: string;
-    @ManyToOne(() => Lecture, (lecture) => lecture.chapters)
+    @ManyToOne(() => Lecture, (lecture) => lecture.chapters, { onDelete: 'CASCADE' })
     lecture: Lecture;
-    @OneToMany(() => Paragraph, (paragraph) => paragraph.chapter, { eager: true, cascade: true })
+    @OneToMany(() => Paragraph, (paragraph) => paragraph.chapter, { eager: true, onDelete: 'CASCADE' })
     paragraphs: Paragraph[];
 }

@@ -12,6 +12,6 @@ export class Post extends EasyCookBaseEntity {
 
     @ManyToOne(() => User, (user) => user.posts)
     user: User;
-    @OneToMany(() => LikedPost, (likedPost) => likedPost.post)
+    @OneToMany(() => LikedPost, (likedPost) => likedPost.post, { onDelete: 'CASCADE' })
     likes: LikedPost[];
 }

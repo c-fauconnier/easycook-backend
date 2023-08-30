@@ -8,6 +8,8 @@ export class Paragraph extends EasyCookBaseEntity {
     index: number;
     @Column()
     content: string;
-    @ManyToOne(() => Chapter, (chapter) => chapter.paragraphs)
+    @Column({ nullable: true })
+    media: string;
+    @ManyToOne(() => Chapter, (chapter) => chapter.paragraphs, { onDelete: 'CASCADE' })
     chapter: Chapter;
 }

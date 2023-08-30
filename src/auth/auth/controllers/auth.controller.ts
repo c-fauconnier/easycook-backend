@@ -1,8 +1,10 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from '../providers/auth.service';
 import * as jwt from 'jsonwebtoken';
 import { jwtConstants } from 'src/auth/auth/constants';
 import { User } from 'src/users/entities/user.entity';
+import { AuthGuard } from '../auth.guard';
+import { Contact } from '../dto/contact.dto';
 const argon2 = require('argon2');
 
 @Controller('auth')
@@ -34,5 +36,16 @@ export class AuthController {
         } catch (error) {
             return 'Le lien de réinitialisation est invalide ou a expiré.';
         }
+    }
+
+    @Post('contact')
+    async sendContactEmail(@Body() contactForm: Contact): Promise<boolean> {
+        return this.authService.sendContactEmail(contactForm);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('verified')
+    async isEmailVerified(@Request() req: any): Promise<boolean> {
+        return this.authService.isEmailVerified(req.user.id);
     }
 }

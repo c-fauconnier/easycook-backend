@@ -8,11 +8,6 @@ import { AuthGuard } from '../../../auth/auth/auth.guard';
 export class EasyCookBaseController<T extends EasyCookBaseEntity> {
     constructor(public service: EasyCookBaseService<T>) {}
 
-    @Get('search')
-    getByName(@Query('key') key: string, @Query('value') value: string): Promise<T[]> {
-        return this.service.getByName(key, value);
-    }
-
     @UseGuards(AuthGuard)
     @Post()
     create(@Body() dto: any, @Request() req: any): Promise<T | HttpException> {
@@ -41,5 +36,10 @@ export class EasyCookBaseController<T extends EasyCookBaseEntity> {
     @Delete(':id')
     delete(@Param('id') id: string, @Request() req: any): Promise<DeleteResult | HttpException> {
         return this.service.delete(id, req.user);
+    }
+
+    @Get('search/params')
+    getByName(@Query('key') key: any, @Query('value') value: any): Promise<T[]> {
+        return this.service.getByName(key, value);
     }
 }

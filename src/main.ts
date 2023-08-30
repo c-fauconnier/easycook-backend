@@ -7,11 +7,11 @@ import { initializeFirebaseApp } from './config/firebase.config';
 initializeFirebaseApp();
 
 async function bootstrap() {
-    const httpsOptions = {
-        key: fs.readFileSync(process.env.CERTBOT_KEY),
-        cert: fs.readFileSync(process.env.CERTBOT_CERT),
-    };
-    const app = await NestFactory.create(AppModule, { httpsOptions });
+    // const httpsOptions = {
+    //     key: fs.readFileSync(process.env.CERTBOT_KEY),
+    //     cert: fs.readFileSync(process.env.CERTBOT_CERT),
+    // };
+    const app = await NestFactory.create(AppModule);
     // On authorise le CORS
     app.enableCors({
         origin: '*',

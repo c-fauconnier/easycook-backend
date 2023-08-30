@@ -8,6 +8,7 @@ import { Token } from '../../../users/interfaces/token.interface';
 import * as jwt from 'jsonwebtoken';
 import { MailerService } from '@nestjs-modules/mailer';
 import { jwtConstants } from 'src/auth/auth/constants';
+import { Contact } from '../dto/contact.dto';
 
 const argon2 = require('argon2');
 
@@ -54,6 +55,53 @@ export class AuthService {
         }
     }
 
+    async sendContactEmail(email: Contact): Promise<boolean> {
+        try {
+            const contactMail = await this.mailerService.sendMail({
+                to: process.env.SENDER_EMAIL,
+                subject: email.subject,
+                html: `            
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <meta charset="UTF-8">
+                  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Demande venant d'un utilisateur</title>
+                </head>
+                <body>
+                  ${email.message}
+                </body>
+                </html>`,
+            });
+            if (contactMail) {
+                await this.mailerService.sendMail({
+                    to: email.email,
+                    subject: 'Formulaire de contact EasyCook',
+                    html: `            
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <meta charset="UTF-8">
+                      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <title>Formulaire de contact EasyCook</title>
+                    </head>
+                    <body>
+                    <p>Nous avons bien reçu votre demande, nous y répondrons dans les plus brefs délais !</p>
+                    <p>Merci,</p>
+                    <p>L'équipe de EasyCook</p>
+                    </body>
+                    </html>`,
+                });
+                return true;
+            }
+            return false;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     // Envoi d'un mail avec un lien pour changer son mot de passe
     async sendPasswordResetEmail(email: string): Promise<User | HttpException> {
         const user = await this.findByEmail(email);
@@ -93,5 +141,14 @@ export class AuthService {
         });
 
         return user;
+    }
+
+    async isEmailVerified(id: string): Promise<boolean> {
+        try {
+            const user = await this.usersRepo.findOne({ where: { id: +id } });
+            return user.isEmailVerified;
+        } catch (err) {
+            throw err;
+        }
     }
 }
