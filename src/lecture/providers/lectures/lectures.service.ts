@@ -59,7 +59,7 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
             if (dto.chapters[i].isCompleted)
                 this.generateNewError(`Le ou les chapitres ne peut(vent) être complété(s) à la création`, `chapters`);
 
-            if (dto.chapters[i].index > 1) this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
+            if (dto.chapters[i].index < 1) this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
 
             if (dto.chapters[i].index !== lastNumber + 1) this.generateNewError(`L'ordre des chapitres est erroné`, 'chapters');
 
@@ -77,7 +77,7 @@ export class LecturesService extends EasyCookBaseService<Lecture> {
                 }
 
                 if (dto.chapters[i].paragraphs[j].index < 1) {
-                    this.generateNewError(`Le numéro du chapitre doit être 1 ou plus`, 'chapters');
+                    this.generateNewError(`Le numéro du paragraphe doit être 1 ou plus`, 'chapters');
                 }
 
                 if (dto.chapters[i].paragraphs[j].index !== lastParagraphNumber + 1) {
